@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Straight-Line Depreciation Revision</title>
+    <style>
+        :root {
+            --macaron-pink: #FFD1DC;
+            --macaron-blue: #AEC6CF;
+            --macaron-green: #B2D8B2;
+            --macaron-yellow: #FDFD96;
+            --macaron-purple: #CDB4DB;
+            --text-dark: #4A4A4A;
+            --bg-light: #FAFAFA;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: var(--macaron-blue);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #f0f0f0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #777;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: white;
+            color: var(--text-dark);
+            border-bottom: 4px solid var(--macaron-purple);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--macaron-yellow);
+            border-radius: 10px;
+        }
+
+        .word-badge {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .formula-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 30px 0;
+            background-color: var(--macaron-green);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        select, input[type="number"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: var(--macaron-blue);
+        }
+
+        .hint-box {
+            background-color: var(--macaron-pink);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .scenario-box {
+            background-color: #f9f9f9;
+            border-left: 5px solid var(--macaron-blue);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mcq-option {
+            display: block;
+            margin: 10px 0;
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mcq-option:hover {
+            border-color: var(--macaron-purple);
+            background-color: #fafafa;
+        }
+
+        .btn-check {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--macaron-purple);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .btn-check:hover {
+            background-color: #b898c7;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .feedback.success {
+            background-color: var(--macaron-green);
+            color: #2d5a2d;
+            display: block;
+        }
+
+        .feedback.error {
+            background-color: var(--macaron-pink);
+            color: #7a2e45;
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📊 Straight-Line Depreciation Master</h1>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'tab1')">Part 1: The Formula</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab2')">Part 2: Calculation</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab3')">Part 3: Concept Check</button>
+    </div>
+
+    <!-- TAB 1: FORMULA -->
+    <div id="tab1" class="tab-content active">
+        <h2>Build the Formula</h2>
+        <p>Select the correct terms from the word bank to build the straight-line method formula.</p>
+        
+        <div class="word-bank">
+            <span class="word-badge">A. Carrying Value</span>
+            <span class="word-badge">B. Depreciation Expense</span>
+            <span class="word-badge">C. Cost</span>
+            <span class="word-badge">D. Accumulated Depreciation</span>
+            <span class="word-badge">E. Residual Value</span>
+            <span class="word-badge">F. Useful Life</span>
+        </div>
+
+        <div class="hint-box">
+            💡 <strong>Hint:</strong> First, think about how much value the asset loses in total, then divide it by the time we expect to use it!
+        </div>
+
+        <div class="formula-container">
+            Annual 
+            <select id="t1-s1">
+                <option value="">--Select--</option>
+                <option value="A">Carrying Value</option>
+                <option value="B">Depreciation Expense</option>
+                <option value="C">Cost</option>
+                <option value="D">Accum. Depreciation</option>
+                <option value="E">Residual Value</option>
+                <option value="F">Useful Life</option>
+            </select>
+            = (
+            <select id="t1-s2">
+                <option value="">--Select--</option>
+                <option value="A">Carrying Value</option>
+                <option value="B">Depreciation Expense</option>
+                <option value="C">Cost</option>
+                <option value="D">Accum. Depreciation</option>
+                <option value="E">Residual Value</option>
+                <option value="F">Useful Life</option>
+            </select>
+            -
+            <select id="t1-s3">
+                <option value="">--Select--</option>
+                <option value="A">Carrying Value</option>
+                <option value="B">Depreciation Expense</option>
+                <option value="C">Cost</option>
+                <option value="D">Accum. Depreciation</option>
+                <option value="E">Residual Value</option>
+                <option value="F">Useful Life</option>
+            </select>
+            ) ÷
+            <select id="t1-s4">
+                <option value="">--Select--</option>
+                <option value="A">Carrying Value</option>
+                <option value="B">Depreciation Expense</option>
+                <option value="C">Cost</option>
+                <option value="D">Accum. Depreciation</option>
+                <option value="E">Residual Value</option>
+                <option value="F">Useful Life</option>
+            </select>
+        </div>
+
+        <button class="btn-check" onclick="checkTab1()">Check Answer</button>
+        <div id="fb-tab1" class="feedback"></div>
+    </div>
+
+    <!-- TAB 2: CALCULATION -->
+    <div id="tab2" class="tab-content">
+        <h2>Apply the Formula</h2>
+        <p>Use the formula you built in Part 1 to solve this scenario.</p>
+        
+        <div class="scenario-box">
+            <strong>Segway Solutions</strong> purchased a delivery vehicle on 1 July 2023.<br><br>
+            • Purchase price: $32,000<br>
+            • Estimated useful life: 4 years<br>
+            • Estimated residual value: $12,800<br><br>
+            <em>Task: Calculate the annual depreciation expense for the year ended 30 June 2024.</em>
+        </div>
+
+        <div class="formula-container" style="background-color: var(--macaron-blue);">
+            Calculation: <br>
+            ($<input type="number" id="t2-i1" placeholder="Amount" style="width: 80px;"> 
+            - $<input type="number" id="t2-i2" placeholder="Amount" style="width: 80px;">) 
+            ÷ <input type="number" id="t2-i3" placeholder="Years" style="width: 60px;"> 
+            = $<input type="number" id="t2-i4" placeholder="Final Amount" style="width: 100px;"> per annum.
+        </div>
+
+        <button class="btn-check" onclick="checkTab2()">Check Answer</button>
+        <div id="fb-tab2" class="feedback"></div>
+    </div>
+
+    <!-- TAB 3: CONCEPT -->
+    <div id="tab3" class="tab-content">
+        <h2>Reflect on the Method</h2>
+        
+        <div class="scenario-box">
+            The straight-line method implies that the business records the <strong>exact same depreciation expense</strong> for four consecutive years. 
+            Does this align with the reality of how a delivery van operates? Read the options and select the most reasonable answer.
+        </div>
+
+        <div class="hint-box">
+            💡 <strong>Hint:</strong> Think about your experience using a brand-new phone versus a 4-year-old phone. Which one runs faster, performs better, and requires fewer repairs?
+        </div>
+
+        <label class="mcq-option">
+            <input type="radio" name="q3" value="A"> A. Yes, because the van is driven the exact same number of hours every year.
+        </label>
+        <label class="mcq-option">
+            <input type="radio" name="q3" value="B"> B. No, because vans are generally more efficient and earn more revenue when new, and suffer more breakdowns as they age.
+        </label>
+        <label class="mcq-option">
+            <input type="radio" name="q3" value="C"> C. Yes, because the physical size of the van doesn't change over the 4 years.
+        </label>
+        <label class="mcq-option">
+            <input type="radio" name="q3" value="D"> D. No, because the van magically gets faster and earns more money in its final year of use.
+        </label>
+
+        <button class="btn-check" onclick="checkTab3()">Check Answer</button>
+        <div id="fb-tab3" class="feedback"></div>
+    </div>
+
+    <div class="footer">
+        Created by: LU GAN
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function checkTab1() {
+        let s1 = document.getElementById("t1-s1").value;
+        let s2 = document.getElementById("t1-s2").value;
+        let s3 = document.getElementById("t1-s3").value;
+        let s4 = document.getElementById("t1-s4").value;
+        let fb = document.getElementById("fb-tab1");
+
+        if (s1 === "B" && s2 === "C" && s3 === "E" && s4 === "F") {
+            fb.className = "feedback success";
+            fb.innerHTML = "🎉 Excellent work! You've perfectly constructed the formula: Annual Depreciation Expense = (Cost - Residual Value) ÷ Useful Life.";
+        } else {
+            fb.className = "feedback error";
+            if (s1 !== "B") {
+                fb.innerHTML = "You're on the right track trying to find the annual amount! Remember, we are trying to calculate the 'Expense' for the period. Have another look at the options.";
+            } else if (s2 === "A" || s2 === "D") {
+                fb.innerHTML = "Good thinking about asset values! However, to find the total value lost, we must start with the original price we paid. Try looking for the term that means historical price.";
+            } else if (s3 !== "E") {
+                fb.innerHTML = "Almost there! We need to subtract what the asset will be worth at the very end of its life (its scrap value). Which term fits that description?";
+            } else {
+                fb.innerHTML = "You've got the right spirit! Check your division step. We need to divide the total lost value by the time we expect to use it in the business.";
+            }
+        }
+    }
+
+    function checkTab2() {
+        let i1 = document.getElementById("t2-i1").value;
+        let i2 = document.getElementById("t2-i2").value;
+        let i3 = document.getElementById("t2-i3").value;
+        let i4 = document.getElementById("t2-i4").value;
+        let fb = document.getElementById("fb-tab2");
+
+        if (i1 == "32000" && i2 == "12800" && i3 == "4" && i4 == "4800") {
+            fb.className = "feedback success";
+            fb.innerHTML = "🌟 Spot on! ($32,000 - $12,800) ÷ 4 = $4,800 per annum. Great calculation skills!";
+        } else {
+            fb.className = "feedback error";
+            if (i1 != "32000") {
+                fb.innerHTML = "Let's review the starting number. Make sure you are using the original purchase price (Cost) in the first box.";
+            } else if (i2 != "12800") {
+                fb.innerHTML = "You've got the Cost right! But remember to subtract the Estimated Residual Value before dividing. Check the scenario details again.";
+            } else if (i3 != "4") {
+                fb.innerHTML = "Your subtraction is set up perfectly! Now, how many years do we expect this vehicle to be useful? Ensure you divide by that number.";
+            } else {
+                fb.innerHTML = "Great job setting up the equation! Just double-check your final math: ($32,000 - $12,800) divided by 4.";
+            }
+        }
+    }
+
+    function checkTab3() {
+        let options = document.getElementsByName("q3");
+        let selectedValue = "";
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].checked) {
+                selectedValue = options[i].value;
+            }
+        }
+        
+        let fb = document.getElementById("fb-tab3");
+
+        if (selectedValue === "B") {
+            fb.className = "feedback success";
+            fb.innerHTML = "🏆 Fantastic analytical thinking! You correctly identified that mechanical assets become less efficient over time. This is exactly why accountants sometimes use the 'Reducing Balance' method for vehicles instead!";
+        } else if (selectedValue === "") {
+            fb.className = "feedback error";
+            fb.innerHTML = "Please select an option before checking your answer.";
+        } else {
+            fb.className = "feedback error";
+            fb.innerHTML = "You considered a logical angle, which is great! However, think about mechanical wear and tear. Does an older engine run as smoothly as a new one, or does it cost more to maintain? Try another option!";
+        }
+    }
+</script>
+
+</body>
+</html>

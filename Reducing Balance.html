@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depreciation Methods Revision</title>
+    <style>
+        :root {
+            --macaron-pink: #FFB7B2;
+            --macaron-blue: #E2F0CB;
+            --macaron-yellow: #FFDAC1;
+            --macaron-purple: #C7CEEA;
+            --macaron-mint: #B5EAD7;
+            --text-dark: #4A4A4A;
+            --bg-light: #FAFAFA;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: var(--macaron-mint);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #f0f0f0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #777;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: white;
+            color: var(--text-dark);
+            border-bottom: 4px solid var(--macaron-purple);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tab 1: Visual Metaphor */
+        .gear-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .gear-box {
+            width: 22%;
+            background-color: var(--macaron-blue);
+            padding: 15px;
+            border-radius: 15px;
+            opacity: 0.3;
+            transition: opacity 0.5s;
+        }
+        
+        .gear-box.active-gear {
+            opacity: 1;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .gear-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .gear-spin {
+            animation: spin 2s linear infinite;
+        }
+        .gear-slow {
+            animation: spin 5s linear infinite;
+        }
+        .gear-stuck {
+            animation: twitch 2s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes twitch { 
+            0%, 100% { transform: rotate(0deg); } 
+            25% { transform: rotate(15deg); } 
+            50% { transform: rotate(-5deg); } 
+        }
+
+        /* Tab 2: Formula */
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--macaron-yellow);
+            border-radius: 10px;
+        }
+
+        .word-badge {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .formula-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 30px 0;
+            background-color: var(--macaron-pink);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Tab 3: Tables */
+        .scenario-box {
+            background-color: #f9f9f9;
+            border-left: 5px solid var(--macaron-purple);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
+        }
+        
+        th, td {
+            border: 2px solid #eee;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--macaron-purple);
+            color: #333;
+        }
+
+        .hidden-row {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .visible-row {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .calc-explanation {
+            font-size: 13px;
+            color: #666;
+            display: block;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #88B04B;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .btn-action:hover {
+            background-color: #769941;
+        }
+        
+        .btn-step {
+            background-color: var(--macaron-purple);
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .feedback.success {
+            background-color: var(--macaron-blue);
+            color: #2d5a2d;
+            display: block;
+        }
+
+        .feedback.error {
+            background-color: var(--macaron-pink);
+            color: #7a2e45;
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📉 Reducing Balance Method vs. Straight-Line</h1>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'tab1')">Part 1: The Gear Metaphor</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab2')">Part 2: The Formula</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab3')">Part 3: The Calculation Train</button>
+    </div>
+
+    <!-- TAB 1: VISUAL METAPHOR -->
+    <div id="tab1" class="tab-content active">
+        <h2>Concept Visualisation: The Wear & Tear of Assets</h2>
+        <p>Why do some assets need to have <strong>more depreciation expense allocated in their early years</strong>? Click the button to progress time and observe the asset's efficiency!</p>
+        
+        <div class="gear-container">
+            <div id="gear1" class="gear-box active-gear">
+                <div class="gear-icon gear-spin">⚙️</div>
+                <h3>Year 1</h3>
+                <p>Shiny and fast! Very efficient, earning high revenue for the business.</p>
+            </div>
+            <div id="gear2" class="gear-box">
+                <div class="gear-icon gear-slow">⚙️</div>
+                <h3>Year 2</h3>
+                <p>Minor scratches. Speed slows slightly as wear and tear begins.</p>
+            </div>
+            <div id="gear3" class="gear-box">
+                <div class="gear-icon gear-stuck">⚙️</div>
+                <h3>Year 3</h3>
+                <p>Rusty and gets stuck. Needs repairs, meaning maintenance costs rise and revenue drops.</p>
+            </div>
+            <div id="gear4" class="gear-box">
+                <div class="gear-icon">💥</div>
+                <h3>Year 4</h3>
+                <p>Completely worn out. Ready to be scrapped or traded in.</p>
+            </div>
+        </div>
+
+        <button class="btn-action" id="timeBtn" onclick="progressTime()">Progress Time ⏩</button>
+        
+        <div id="gear-feedback" class="scenario-box" style="display: none; margin-top: 20px; background-color: var(--macaron-yellow);">
+            💡 <strong>The Takeaway:</strong> Because the asset earns more revenue when it is new (Year 1), the <strong>Reducing Balance Method</strong> matches that high early revenue with a higher depreciation expense. This aligns with the Accrual Accounting assumption!
+        </div>
+    </div>
+
+    <!-- TAB 2: FORMULA BUILDER -->
+    <div id="tab2" class="tab-content">
+        <h2>Build the Reducing Balance Formula</h2>
+        <p>Unlike the Straight-Line method (which uses Historical Cost), the Reducing Balance method applies a percentage rate to the declining value of the asset. Select the professional terms to build the formula for calculating the annual expense.</p>
+        
+        <div class="word-bank">
+            <span class="word-badge">A. Historical Cost</span>
+            <span class="word-badge">B. Depreciation Expense</span>
+            <span class="word-badge">C. Carrying Value</span>
+            <span class="word-badge">D. Residual Value</span>
+            <span class="word-badge">E. Depreciation Rate</span>
+        </div>
+
+        <div class="formula-container">
+            Annual 
+            <select id="t2-s1">
+                <option value="">--Select--</option>
+                <option value="A">Historical Cost</option>
+                <option value="B">Depreciation Expense</option>
+                <option value="C">Carrying Value</option>
+                <option value="D">Residual Value</option>
+                <option value="E">Depreciation Rate</option>
+            </select>
+            = 
+            <select id="t2-s2">
+                <option value="">--Select--</option>
+                <option value="A">Historical Cost</option>
+                <option value="B">Depreciation Expense</option>
+                <option value="C">Carrying Value</option>
+                <option value="D">Residual Value</option>
+                <option value="E">Depreciation Rate</option>
+            </select>
+            ×
+            <select id="t2-s3">
+                <option value="">--Select--</option>
+                <option value="A">Historical Cost</option>
+                <option value="B">Depreciation Expense</option>
+                <option value="C">Carrying Value</option>
+                <option value="D">Residual Value</option>
+                <option value="E">Depreciation Rate</option>
+            </select>
+        </div>
+
+        <button class="btn-action" onclick="checkTab2()">Check Formula</button>
+        <div id="fb-tab2" class="feedback"></div>
+    </div>
+
+    <!-- TAB 3: CALCULATION COMPARISON -->
+    <div id="tab3" class="tab-content">
+        <h2>The VCE Shortcut & Comparison</h2>
+        
+        <div class="scenario-box">
+            <strong>🔥 VCE Exam Tip:</strong> You don't need a complex root formula! <br>
+            <strong>Reducing Balance Rate = Straight-Line Rate × 1.5</strong>
+        </div>
+
+        <div class="scenario-box" style="background-color: var(--macaron-blue);">
+            <strong>Scenario:</strong> Bellarine Stationery & Printing purchased a photocopier on 1 July 2028 for <strong>$35,000</strong> (ignore GST).<br>
+            The owner is unsure which method to use. She is advised to use either <strong>10% Straight-Line</strong> OR <strong>15% Reducing Balance</strong>. Let's compare!
+        </div>
+
+        <h3>1. Straight-Line Method (10% on Cost)</h3>
+        <p><em>Notice how the depreciation expense is rigid and never changes!</em></p>
+        <table>
+            <tr>
+                <th>Year ended 30 June</th>
+                <th>Depreciation Expense</th>
+                <th>Accumulated Depreciation</th>
+                <th>Carrying Value</th>
+            </tr>
+            <tr>
+                <td>2029</td>
+                <td>$3,500 <br><span class="calc-explanation">($35,000 × 10%)</span></td>
+                <td>$3,500</td>
+                <td>$31,500 <br><span class="calc-explanation">($35,000 - $3,500)</span></td>
+            </tr>
+            <tr>
+                <td>2030</td>
+                <td>$3,500 <br><span class="calc-explanation">($35,000 × 10%)</span></td>
+                <td>$7,000 <br><span class="calc-explanation">($3,500 + $3,500)</span></td>
+                <td>$28,000 <br><span class="calc-explanation">($35,000 - $7,000)</span></td>
+            </tr>
+            <tr>
+                <td>2031</td>
+                <td>$3,500 <br><span class="calc-explanation">($35,000 × 10%)</span></td>
+                <td>$10,500 <br><span class="calc-explanation">($7,000 + $3,500)</span></td>
+                <td>$24,500 <br><span class="calc-explanation">($35,000 - $10,500)</span></td>
+            </tr>
+        </table>
+
+        <h3>2. Reducing Balance Method (15% on Carrying Value)</h3>
+        <p><em>Let's calculate this step-by-step. Click the button to reveal the next stop on our Calculation Train!</em></p>
+        
+        <button class="btn-step" id="trainBtn" onclick="nextTrainStep()">🚂 Choo Choo! Calculate 2029</button>
+
+        <table>
+            <tr>
+                <th>Year ended 30 June</th>
+                <th>Depreciation Expense</th>
+                <th>Accumulated Depreciation</th>
+                <th>Carrying Value</th>
+            </tr>
+            <tr id="row-2029" class="hidden-row">
+                <td>2029</td>
+                <td>$5,250 <br><span class="calc-explanation">($35,000 CV × 15%)</span></td>
+                <td>$5,250</td>
+                <td>$29,750 <br><span class="calc-explanation">($35,000 Cost - $5,250 Accum)</span></td>
+            </tr>
+            <tr id="row-2030" class="hidden-row">
+                <td>2030</td>
+                <td>$4,463 <br><span class="calc-explanation">($29,750 CV × 15%)</span></td>
+                <td>$9,713 <br><span class="calc-explanation">($5,250 + $4,463)</span></td>
+                <td>$25,287 <br><span class="calc-explanation">($35,000 Cost - $9,713 Accum)</span></td>
+            </tr>
+            <tr id="row-2031" class="hidden-row">
+                <td>2031</td>
+                <td>$3,793 <br><span class="calc-explanation">($25,287 CV × 15%)</span></td>
+                <td>$13,506 <br><span class="calc-explanation">($9,713 + $3,793)</span></td>
+                <td>$21,494 <br><span class="calc-explanation">($35,000 Cost - $13,506 Accum)</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        Creator: LU GAN
+    </div>
+</div>
+
+<script>
+    // Tab Navigation
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    // Tab 1 Logic: Gear Progression
+    let currentYear = 1;
+    function progressTime() {
+        if (currentYear < 4) {
+            currentYear++;
+            document.getElementById(`gear${currentYear}`).classList.add('active-gear');
+            
+            if (currentYear === 4) {
+                document.getElementById('timeBtn').style.display = 'none';
+                document.getElementById('gear-feedback').style.display = 'block';
+            }
+        }
+    }
+
+    // Tab 2 Logic: Formula Checking
+    function checkTab2() {
+        let s1 = document.getElementById("t2-s1").value;
+        let s2 = document.getElementById("t2-s2").value;
+        let s3 = document.getElementById("t2-s3").value;
+        let fb = document.getElementById("fb-tab2");
+
+        if (s1 === "B" && ((s2 === "C" && s3 === "E") || (s2 === "E" && s3 === "C"))) {
+            fb.className = "feedback success";
+            fb.innerHTML = "🎉 Excellent! Depreciation Expense = Carrying Value × Depreciation Rate. You correctly identified that we apply the rate to the unexpired cost (Carrying Value) rather than the Historical Cost!";
+            
+            // Reverse verification text
+            fb.innerHTML += "<br><br><em>Reverse Check: As Carrying Value goes down every year, multiplying it by the same rate means the Depreciation Expense will also go down every year. Perfect logic!</em>";
+        } else {
+            fb.className = "feedback error";
+            if (s1 !== "B") {
+                fb.innerHTML = "You're thinking deeply! But remember, the goal of this formula is to calculate the amount we write off as an expense for the current period. Which term belongs on the left?";
+            } else if (s2 === "A" || s3 === "A") {
+                fb.innerHTML = "Great thought process! You selected 'Historical Cost', which is important for the Straight-Line method. But remember, the Reducing Balance method applies the rate to the *declining value* of the asset. What term represents the value yet to be depreciated?";
+            } else {
+                fb.innerHTML = "Almost there! We need to multiply the unexpired value of the asset by the percentage rate. Try adjusting your selections on the right side of the equals sign.";
+            }
+        }
+    }
+
+    // Tab 3 Logic: Train Step Reveal
+    let trainStep = 0;
+    function nextTrainStep() {
+        trainStep++;
+        let btn = document.getElementById('trainBtn');
+        
+        if (trainStep === 1) {
+            document.getElementById('row-2029').classList.add('visible-row');
+            btn.innerHTML = "🚂 Calculate 2030";
+        } else if (trainStep === 2) {
+            document.getElementById('row-2030').classList.add('visible-row');
+            btn.innerHTML = "🚂 Calculate 2031";
+        } else if (trainStep === 3) {
+            document.getElementById('row-2031').classList.add('visible-row');
+            btn.innerHTML = "🏆 Destination Reached! Compare the two methods.";
+            btn.style.backgroundColor = "#B5EAD7"; // Mint color to show completion
+            btn.style.cursor = "default";
+            btn.disabled = true;
+        }
+    }
+</script>
+
+</body>
+</html>
