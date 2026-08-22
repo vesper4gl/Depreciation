@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depreciation Revision Tool</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --macaron-pink: #FFB7B2;
+            --macaron-green: #E2F0CB;
+            --macaron-peach: #FFDAC1;
+            --macaron-blue: #C7CEEA;
+            --macaron-yellow: #FFF1C1;
+            --text-main: #555;
+            --bg-light: #FDFDFD;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: var(--macaron-blue);
+            padding: 25px;
+            text-align: center;
+            color: #333;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #f7f7f7;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background-color: white;
+            color: #333;
+            border-bottom: 4px solid var(--macaron-pink);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-box {
+            background-color: var(--macaron-yellow);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .question-box h3 {
+            margin-top: 0;
+        }
+
+        .btn-option, .btn-action {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            background-color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .btn-option:hover {
+            border-color: var(--macaron-blue);
+            background-color: #fafafa;
+        }
+
+        .btn-action {
+            background-color: var(--macaron-pink);
+            color: #333;
+            text-align: center;
+            border: none;
+        }
+
+        .btn-action:hover {
+            background-color: #ff9d96;
+        }
+
+        .btn-action:disabled {
+            background-color: #e0e0e0;
+            cursor: not-allowed;
+            color: #999;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 80px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .feedback.success {
+            background-color: var(--macaron-green);
+            color: #2b5014;
+            display: block;
+        }
+
+        .feedback.error {
+            background-color: var(--macaron-peach);
+            color: #703a16;
+            display: block;
+        }
+        
+        .explanation-text {
+            font-size: 14px;
+            margin-top: 10px;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+            padding-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--macaron-blue);
+            color: #333;
+        }
+
+        .hidden-row {
+            display: none;
+        }
+        
+        .calc-detail {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            color: #999;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📊 VCE Accounting: Depreciation Master</h1>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('tab1')">Part 1: Concept Quiz</button>
+        <button class="tab-btn" onclick="openTab('tab2')">Part 2: Calculation Steps</button>
+        <button class="tab-btn" onclick="openTab('tab3')">Part 3: Visualise the Trend</button>
+    </div>
+
+    <!-- TAB 1 -->
+    <div id="tab1" class="tab-content active">
+        <div class="question-box">
+            <h3>Q1. Which of the following assets would most likely use the Reducing Balance Method?</h3>
+            <button class="btn-option" onclick="checkQ1('A')">A. Office bookshelves</button>
+            <button class="btn-option" onclick="checkQ1('B')">B. Delivery vehicles</button>
+            <button class="btn-option" onclick="checkQ1('C')">C. Display glass cabinets</button>
+            <div id="fb-q1" class="feedback"></div>
+        </div>
+
+        <div class="question-box" style="background-color: var(--macaron-green);">
+            <h3>Q2. Step-by-Step Application</h3>
+            <p>A business buys a new computer for $2,000. The accountant tells you to use the Reducing Balance method at a rate of 20% per year.</p>
+            <p><strong>Require:</strong> Calculate the Depreciation Expense for Year 1 and Year 2.</p>
+            
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <p><strong>Year 1 Depreciation Expense:</strong></p>
+                <p>$<input type="text" id="q2_1"> × 20% = $<input type="text" id="q2_2"></p>
+                
+                <p><strong>Year 2 Depreciation Expense:</strong></p>
+                <p>Step 1: New Carrying Value = $2,000 - $<input type="text" id="q2_3"> = $<input type="text" id="q2_4"></p>
+                <p>Step 2: Year 2 Expense = $<input type="text" id="q2_5"> × 20% = $<input type="text" id="q2_6"></p>
+            </div>
+            
+            <button class="btn-action" onclick="checkQ2()" style="margin-top: 15px;">Check Answers</button>
+            <div id="fb-q2" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- TAB 2 -->
+    <div id="tab2" class="tab-content">
+        <div class="question-box" style="background-color: var(--macaron-blue);">
+            <h3>Scenario Comparison</h3>
+            <p>Bellarine Stationery & Printing purchased a photocopier on 1 July 2028 for <strong>$35,000</strong> (ignore GST).</p>
+            <p>The owner is advised to use either <strong>10% Straight-Line</strong> OR <strong>15% Reducing Balance</strong>.</p>
+        </div>
+
+        <button id="btn-reveal-row" class="btn-action" onclick="revealNextYear()">Reveal Year 2029 Data ⬇️</button>
+        
+        <h4 style="margin-top: 25px;">Straight-Line Method (10% on Cost)</h4>
+        <table id="table-sl">
+            <thead>
+                <tr>
+                    <th>Year ended 30 June</th>
+                    <th>Depreciation Expense</th>
+                    <th>Accumulated Depreciation</th>
+                    <th>Carrying Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="hidden-row" id="sl-2029">
+                    <td>2029</td><td>$3,500 <span class="calc-detail">($35,000 × 10%)</span></td><td>$3,500</td><td>$31,500 <span class="calc-detail">($35,000 - $3,500)</span></td>
+                </tr>
+                <tr class="hidden-row" id="sl-2030">
+                    <td>2030</td><td>$3,500 <span class="calc-detail">($35,000 × 10%)</span></td><td>$7,000 <span class="calc-detail">($3,500 + $3,500)</span></td><td>$28,000 <span class="calc-detail">($35,000 - $7,000)</span></td>
+                </tr>
+                <tr class="hidden-row" id="sl-2031">
+                    <td>2031</td><td>$3,500 <span class="calc-detail">($35,000 × 10%)</span></td><td>$10,500 <span class="calc-detail">($7,000 + $3,500)</span></td><td>$24,500 <span class="calc-detail">($35,000 - $10,500)</span></td>
+                </tr>
+                <tr class="hidden-row" id="sl-2032">
+                    <td>2032</td><td>$3,500 <span class="calc-detail">($35,000 × 10%)</span></td><td>$14,000 <span class="calc-detail">($10,500 + $3,500)</span></td><td>$21,000 <span class="calc-detail">($35,000 - $14,000)</span></td>
+                </tr>
+                <tr class="hidden-row" id="sl-2033">
+                    <td>2033</td><td>$3,500 <span class="calc-detail">($35,000 × 10%)</span></td><td>$17,500 <span class="calc-detail">($14,000 + $3,500)</span></td><td>$17,500 <span class="calc-detail">($35,000 - $17,500)</span></td>
+                </tr>
+                <tr class="hidden-row" id="sl-2034">
+                    <td>2034</td><td>$3,500 <span class="calc-detail">($35,000 × 10%)</span></td><td>$21,000 <span class="calc-detail">($17,500 + $3,500)</span></td><td>$14,000 <span class="calc-detail">($35,000 - $21,000)</span></td>
+                </tr>
+                <tr class="hidden-row" id="sl-2035">
+                    <td>2035</td><td>$3,500 <span class="calc-detail">($35,000 × 10%)</span></td><td>$24,500 <span class="calc-detail">($21,000 + $3,500)</span></td><td>$10,500 <span class="calc-detail">($35,000 - $24,500)</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4 style="margin-top: 25px;">Reducing Balance Method (15% on Carrying Value)</h4>
+        <table id="table-rb">
+            <thead>
+                <tr>
+                    <th>Year ended 30 June</th>
+                    <th>Depreciation Expense</th>
+                    <th>Accumulated Depreciation</th>
+                    <th>Carrying Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="hidden-row" id="rb-2029">
+                    <td>2029</td><td>$5,250 <span class="calc-detail">($35,000 × 15%)</span></td><td>$5,250</td><td>$29,750 <span class="calc-detail">($35,000 - $5,250)</span></td>
+                </tr>
+                <tr class="hidden-row" id="rb-2030">
+                    <td>2030</td><td>$4,463 <span class="calc-detail">($29,750 × 15%)</span></td><td>$9,713 <span class="calc-detail">($5,250 + $4,463)</span></td><td>$25,287 <span class="calc-detail">($35,000 - $9,713)</span></td>
+                </tr>
+                <tr class="hidden-row" id="rb-2031">
+                    <td>2031</td><td>$3,793 <span class="calc-detail">($25,287 × 15%)</span></td><td>$13,506 <span class="calc-detail">($9,713 + $3,793)</span></td><td>$21,494 <span class="calc-detail">($35,000 - $13,506)</span></td>
+                </tr>
+                <tr class="hidden-row" id="rb-2032">
+                    <td>2032</td><td>$3,224 <span class="calc-detail">($21,494 × 15%)</span></td><td>$16,730 <span class="calc-detail">($13,506 + $3,224)</span></td><td>$18,270 <span class="calc-detail">($35,000 - $16,730)</span></td>
+                </tr>
+                <tr class="hidden-row" id="rb-2033">
+                    <td>2033</td><td>$2,741 <span class="calc-detail">($18,270 × 15%)</span></td><td>$19,471 <span class="calc-detail">($16,730 + $2,741)</span></td><td>$15,529 <span class="calc-detail">($35,000 - $19,471)</span></td>
+                </tr>
+                <tr class="hidden-row" id="rb-2034">
+                    <td>2034</td><td>$2,329 <span class="calc-detail">($15,529 × 15%)</span></td><td>$21,800 <span class="calc-detail">($19,471 + $2,329)</span></td><td>$13,200 <span class="calc-detail">($35,000 - $21,800)</span></td>
+                </tr>
+                <tr class="hidden-row" id="rb-2035">
+                    <td>2035</td><td>$1,980 <span class="calc-detail">($13,200 × 15%)</span></td><td>$23,780 <span class="calc-detail">($21,800 + $1,980)</span></td><td>$11,220 <span class="calc-detail">($35,000 - $23,780)</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- TAB 3 -->
+    <div id="tab3" class="tab-content">
+        <div class="question-box" style="background-color: var(--macaron-peach);">
+            <h3>Graphing the Asset's Value Over Time</h3>
+            <p>Let's map out the <strong>Carrying Value</strong> calculated in Part 2. Observe the shape of the lines created by the two different depreciation methods.</p>
+            <button id="btn-chart-step" class="btn-action" onclick="advanceChart()">Plot Year 2029 📈</button>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="depreciationChart"></canvas>
+        </div>
+    </div>
+
+    <div class="footer">
+        Creator: LU GAN
+    </div>
+</div>
+
+<script>
+    // Tab Logic
+    function openTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Quiz 1 Logic
+    function checkQ1(answer) {
+        const fb = document.getElementById('fb-q1');
+        if(answer === 'B') {
+            fb.className = 'feedback success';
+            fb.innerHTML = `<strong>Correct! Delivery Vehicles.</strong>
+                <div class="explanation-text">Machinery and vehicles often work at their highest efficiency when brand new, generating more revenue in their early years. Matching a higher depreciation expense to this higher revenue aligns perfectly with the <strong>Period Assumption</strong>.</div>`;
+        } else {
+            fb.className = 'feedback error';
+            fb.innerHTML = `<strong>Good try! But let's reconsider.</strong>
+                <div class="explanation-text">You successfully identified these as non-current assets. However, bookshelves and display cabinets tend to provide a <em>constant</em> level of value and revenue over their entire useful life regardless of their age. Because of this constant value, they are better suited for the Straight-Line Method. Try again to find the asset that loses efficiency!</div>`;
+        }
+    }
+
+    // Quiz 2 Logic
+    function checkQ2() {
+        const q1 = document.getElementById('q2_1').value.replace(/,/g, '');
+        const q2 = document.getElementById('q2_2').value.replace(/,/g, '');
+        const q3 = document.getElementById('q2_3').value.replace(/,/g, '');
+        const q4 = document.getElementById('q2_4').value.replace(/,/g, '');
+        const q5 = document.getElementById('q2_5').value.replace(/,/g, '');
+        const q6 = document.getElementById('q2_6').value.replace(/,/g, '');
+        
+        const fb = document.getElementById('fb-q2');
+        let allCorrect = true;
+        
+        if (q1 == 2000 && q2 == 400 && q3 == 400 && q4 == 1600 && q5 == 1600 && q6 == 320) {
+            fb.className = 'feedback success';
+            fb.innerHTML = `<strong>Outstanding Calculations!</strong>
+                <div class="explanation-text">
+                <strong>Year 1:</strong> You correctly applied the rate directly to the Historical Cost ($2,000) since no accumulated depreciation existed yet.<br><br>
+                <strong>Year 2 (Step 1 & 2):</strong> You brilliantly deduced that Carrying Value = Historical Cost less Accumulated Depreciation ($2,000 - $400 = $1,600). By applying the 20% rate to this new, lower Carrying Value, the expense decreased to $320. This perfectly demonstrates how a fixed percentage rate multiplied by a declining carrying value results in a reducing expense!
+                </div>`;
+        } else {
+            fb.className = 'feedback error';
+            fb.innerHTML = `<strong>You are on the right track, let's fine-tune some numbers!</strong>
+                <div class="explanation-text">
+                For Year 1, ensure you start with the original purchase cost.<br>
+                For Year 2, remember that Carrying Value = Historical Cost - Accumulated Depreciation. You must subtract Year 1's expense to find the new value before multiplying by 20%. Keep going!
+                </div>`;
+        }
+    }
+
+    // Tab 2 Row Reveal Logic
+    let currentYearIdx = 2029;
+    function revealNextYear() {
+        if(currentYearIdx <= 2035) {
+            document.getElementById(`sl-${currentYearIdx}`).style.display = 'table-row';
+            document.getElementById(`rb-${currentYearIdx}`).style.display = 'table-row';
+            currentYearIdx++;
+            
+            const btn = document.getElementById('btn-reveal-row');
+            if(currentYearIdx <= 2035) {
+                btn.innerHTML = `Reveal Year ${currentYearIdx} Data ⬇️`;
+            } else {
+                btn.innerHTML = "All Data Revealed! ✨";
+                btn.disabled = true;
+            }
+        }
+    }
+
+    // Tab 3 Chart Logic
+    const labels = ['2028 (Purchase)'];
+    const dataSL = [35000];
+    const dataRB = [35000];
+    
+    // Master data arrays
+    const allLabels = ['2029', '2030', '2031', '2032', '2033', '2034', '2035'];
+    const allSL = [31500, 28000, 24500, 21000, 17500, 14000, 10500];
+    const allRB = [29750, 25287, 21494, 18270, 15529, 13200, 11220];
+    
+    let chartStep = 0;
+    let myChart;
+
+    window.onload = function() {
+        const ctx = document.getElementById('depreciationChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Straight-Line Method (Carrying Value)',
+                        data: dataSL,
+                        borderColor: '#FFB7B2',
+                        backgroundColor: '#FFB7B2',
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        fill: false,
+                        tension: 0
+                    },
+                    {
+                        label: 'Reducing Balance Method (Carrying Value)',
+                        data: dataRB,
+                        borderColor: '#C7CEEA',
+                        backgroundColor: '#C7CEEA',
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 40000,
+                        title: {
+                            display: true,
+                            text: 'Carrying Value ($)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' }
+                }
+            }
+        });
+    };
+
+    function advanceChart() {
+        if(chartStep < allLabels.length) {
+            myChart.data.labels.push(allLabels[chartStep]);
+            myChart.data.datasets[0].data.push(allSL[chartStep]);
+            myChart.data.datasets[1].data.push(allRB[chartStep]);
+            myChart.update();
+            chartStep++;
+            
+            const btn = document.getElementById('btn-chart-step');
+            if(chartStep < allLabels.length) {
+                btn.innerHTML = `Plot Year ${allLabels[chartStep]} 📈`;
+            } else {
+                btn.innerHTML = "Notice the Horizontal Line vs. the Decreasing Curve! 📉";
+                btn.disabled = true;
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
