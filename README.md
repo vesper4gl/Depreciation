@@ -12,11 +12,17 @@ Click the button and select "Download ZIP" from the dropdown menu.
 
 Once the ZIP file is downloaded, locate it on your computer and extract/unzip the folder.
 
-Inside the extracted folder, you will find two files:
+Inside the extracted folder, you will find three files:
 
---> Lesson 1 Icebreaking activities.html
+For Lesson 1:
 
---> Reducing Balance.html
+    --> Lesson 1 Icebreaking activities.html
+
+    --> Reducing Balance.html
+
+For Lesson 2:
+
+    --> Lesson 2 Depreciation Revision
 
 Double-click on either file. It will automatically open in your default web browser (e.g., Chrome, Safari, Edge).
 
